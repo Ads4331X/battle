@@ -59,10 +59,11 @@ class Cmds{
                     race = "Elves";
                     return "/elves <br> <p class='text-success'>Race Selected as Elves</p>"}
                 else  return `<p class='text-danger'>You have already started. Your race is ${race}</p>`;   
-            case '/Dwarfs':
-                 if(race === null) {
+            case '/dwarfs':
+                if(race === null) {
                     race = "Dwarfs";
-                    return "/dwarfs <br> <p class='text-success'>Race Selected as Dwarfs</p>"}
+                    return "/dwarfs <br> <p class='text-success'>Race Selected as Dwarfs</p>";
+                }
                 else  return `<p class='text-danger'>You have already started. Your race is ${race}</p>`;   
 
             default:
