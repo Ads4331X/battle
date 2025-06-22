@@ -1,0 +1,19 @@
+* {
+  box-sizing: border-box;
+}
+
+.game_board {
+  max-width: 800px;
+  margin: auto;
+  padding: 0;
+  display: grid;
+  border: none;
+  justify-content: center;
+}
+
+
+.inside {
+  width: 100px !important;
+  height: 100px !important;
+  cursor: pointer;
+}

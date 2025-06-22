@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Memory Game</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="text-center">
+      <h1>Memory Game</h1>
+    </div>
+    <div>
+      <div class="level d-flex justify-content-center mt-5">
+        <div class="bg-dark w-50 text-center p-5">
+          <p class="text-light">Select the difficulty:</p>
+          <button class="easy btn btn-md btn-primary m-2" onclick="easy()">
+            Easy
+          </button>
+          <button class="medium btn btn-md btn-success m-2" onclick="medium()">
+            Medium
+          </button>
+          <button class="hard btn btn-md btn-danger m-2" onclick="hard()">
+            Hard
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="game_board d-none mt-4"></div>
+    <script src="script.js"></script>
+  </body>
+</html>
+
+
