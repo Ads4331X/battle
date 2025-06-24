@@ -1,3 +1,5 @@
+
+
 input {
   outline: 1px solid rgb(255, 89, 117);
   border: none;
@@ -26,4 +28,21 @@ a {
   padding: 10px;
 }
 
+.profile-stats-block p {
+  margin-bottom: 0.2rem;
+  line-height: 1.2;
+}
 
+.race_space {
+  padding-left: 1rem !important;
+}
+
+.level_up {
+  margin-bottom: 0.1rem;
+  line-height: 0.5;
+}
+
+.typing {
+  display: flex;
+  justify-content: space-evenly;
+}
