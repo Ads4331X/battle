@@ -1,6 +1,7 @@
-let character = null;
+let character =null;
 let race = null;
-
+let enemy;
+let round;
 
 class Cmds{
     constructor(character){
@@ -80,10 +81,7 @@ class Cmds{
                     }
                 }else{
                     return "You need to start your adventure first! Use <a href='#'onclick=\"document.getElementById('input').value = '/Start'\" >/start</a> to choose a race.";
-                }
-
-
-                
+                }            
 
             case '/human':
                 if(race === null) {
@@ -124,25 +122,7 @@ class Cmds{
                 if(!character) {
                     return "<p class='text-danger'>You Have To Create a Character first</p>"
                 }
-                let round = 0;
-                let enemy = new Enemy()
-                while(character.hp > 0 && enemy.hp > 0){
-                    round++;
-                    let battle = document.querySelector('.battle');
-                    let battle_board = document.createElement("div");
-                    battle_board.classList.add("bg-secondary" , "w-25" , "h-25" , "pb-2" );
-                    let action_buttons = document.createElement("button");
-                    action_buttons.classList.add("btn" , "btn-info" , "btn-sm" , "text-light");
-                    battle_board.innerHTML = "1";
-                    action_buttons.innerHTML = 1;
 
-
-
-                    battle.appendChild(battle_board);
-                    battle_board.appendChild(action_buttons);
-                     
-                                        character.hp = 0;
-                }
             default:
                 return cmds;
                 // return "<p class='text-danger'>Unknown Command. Try <a href='#'onclick=\"document.getElementById('input').value = '/Help'\">/Help</a></p>"
@@ -152,8 +132,15 @@ class Cmds{
 
 
 
-class Board{
-    checkmessage(){
+
+    
+  
+    
+class Board {
+    constructor() {
+        this.enemy = null;
+        this.currentBattleBoard = null; 
+    }  checkmessage(){
         let message = document.getElementById('input');
         let cmds = ['/help' , '/p' , '/cd' , '/missions' , '/lv-up' , '/start' , '/battle' , '/human' , '/demon' , '/goddess' , '/elves' , '/dwarfs'];
         if(message.value.trim() !== ''){
@@ -167,17 +154,137 @@ class Board{
                     info.classList.add("text-primary" );
                 }            
             }
+            
             let comand_handle = new Cmds(character);
             info.innerHTML = comand_handle.handle(message.value);
             content.appendChild(info);
+            if (message.value.toLowerCase() === "/battle") {
+                let board = new Board(character);
+                round = 1;
+                board.battle(round , info);
+            }
             document.getElementById('input').value = "";
             
         }
-
-
     }
+
+    battle(round, infoDiv) { 
+        if (!this.enemy || round === 1) {
+            this.enemy = new Enemy();
+        }
+
+
+        let tempBattleContentDiv = document.createElement("div");
+
+        tempBattleContentDiv.innerHTML = `
+            <p class='text-center text-light'><strong>Round:${round}</strong></p>
+            <div class='battle_visual'>
+                <div class='player text-light'><p>Player</p><img src='https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg'></div>
+                <div class='text-center bg-secondary'> <p class='text-danger'>1.Attack</p>
+                    <p class='text-primary'>2.Defend</p>
+                    <P class='text-lime'>3.Sleep</P>
+                    <P class='surrender-text'>4.Surrender</P>
+                    <P class='text-gradient'>5.Special Move</P>
+                </div>
+                <div class='enemy text-light'><p>Enemy</p><img src='https://w7.pngwing.com/pngs/9/115/png-transparent-bomb-cartoon-cherry-enemy-evil-explosive-eyes-fuse-game-purple-thumbnail.png'></div>
+            </div><br>
+            <div class='battle_info'>
+                <div class='player_info'>
+                    <p>Players info:</p>
+                    <P>Race:${character.race}</P>
+                    <p>HP:${character.hp}</p>
+                    <P>att:${character.att}</P>
+                    <p>Def:${character.def}</p>
+                    <P>Energy:${character.energylevel}</P>
+                </div>
+                <div class='enemy_info'>
+                    <p>Enemy info:</p>
+                    <p>HP:${this.enemy.hp}</p> <P>att:${this.enemy.att}</P>
+                    <p>Def:${this.enemy.def}</p>
+                    <P>Energy:${this.enemy.energylevel}</P>
+                </div>
+            </div>
+        `; 
+
+        if (this.currentBattleBoard) {
+            this.currentBattleBoard.innerHTML = tempBattleContentDiv.innerHTML; 
+        } else {
+            this.currentBattleBoard = document.createElement("div");
+            this.currentBattleBoard.classList.add("pb-2", "bg-dark", "battle");
+            this.currentBattleBoard.innerHTML = tempBattleContentDiv.innerHTML; 
+            infoDiv.insertAdjacentElement("afterend", this.currentBattleBoard);
+        }
+        this.addBattleActionButtons(this.currentBattleBoard, round, infoDiv);
+    }
+
+    addBattleActionButtons(battleBoardDiv, currentRound, currentInfoDiv) {
+
+        let existingActionDiv = battleBoardDiv.querySelector(".action-buttons-container");
+        if (existingActionDiv) {
+            existingActionDiv.remove();
+        }
+
+        let actionBtnDiv = document.createElement("div"); 
+        actionBtnDiv.classList.add("p-3", "text-center", "action-buttons-container");
+
+        let button_ids = ["attack", "defend", "sleep", "surrender", "special"];
+
+        for (let i = 0; i <= 4; i++) {
+            let action_buttons = document.createElement("button");
+            action_buttons.classList.add("btn", "btn-info", "btn-sm", "text-light", "ms-2", "px-3", "text-center", `${button_ids[i]}`);
+
+            if (i === 4) {
+                action_buttons.classList.add("special_move_btn");
+                action_buttons.textContent = "Special";
+            } else {
+                action_buttons.textContent = i + 1;
+            }
+
+            action_buttons.addEventListener("click", () => {
+                switch (button_ids[i]) {
+                    case "attack":
+                        this.attack(currentRound, currentInfoDiv);
+                        break;
+                    case "defend":
+                        this.defend(currentRound, currentInfoDiv);
+                        break;
+                    case "sleep":
+                        this.sleep(currentRound, currentInfoDiv);
+                        break;
+                    case "surrender":
+                        this.surrender(currentRound, currentInfoDiv);
+                        break;
+                    case "special":
+                        this.special(currentRound, currentInfoDiv);
+                        break;
+                }
+            });
+            actionBtnDiv.appendChild(action_buttons);
+        }
+        battleBoardDiv.appendChild(actionBtnDiv); 
+    }
+        attack(round , info){
+
+            let player_att = character.att;
+            let enemy_att = this.enemy.att;
+            let enemy_def = this.enemy.def;
+            let player_def = character.def;
+            let player_dmg = Math.max(0, player_att - enemy_def);
+            let enemy_dmg = Math.max(0, enemy_att - player_def);
+            this.enemy.hp -= player_dmg;
+            character.hp -= enemy_dmg;
+
+            this.battle(round +1 , info);
+        }
     
-}
+}    
+             
+
+
+
+        
+
+    
 
 class Enemy{
     constructor(){
