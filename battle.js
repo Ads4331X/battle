@@ -2,6 +2,11 @@ let character =null;
 let race = null;
 let enemy;
 let round;
+let player_dmg;
+let enemy_dmg;
+let enemy_action;
+let battle_ongoing;
+let player_hp;
 
 class Cmds{
     constructor(character){
@@ -86,7 +91,7 @@ class Cmds{
             case '/human':
                 if(race === null) {
                     race = "Human";
-                    character = new Character("Name" , 100, 10 , 10 , 1 , 8 , 100, race);
+                    character = new Character("Name" , 1, 10 , 10 , 1 , 10 , 100, race);
                     return "/human <br> <p class='text-success'>Race Selected as Human</p>"
                 }
                 else  {
@@ -95,13 +100,13 @@ class Cmds{
             case '/demon':
                  if(race === null) {
                     race = "Demon";
-                    character = new Character("Name" , 150, 18 , 6 , 1 , 4 , 100, race);
+                    character = new Character("Name" , 150, 20 , 10 , 1 , 4 , 100, race);
                     return "/demon <br> <p class='text-success'>Race Selected as Demon</p>"}
                 else  return `<p class='text-danger'>You have already started. Your race is ${race}</p>`;   
             case '/goddess':
                  if(race === null) {
                     race = "Goddess";
-                    character = new Character("Name" , 200, 4 , 8 , 1 , 14 , 100, race);
+                    character = new Character("Name" , 200, 16 , 12 , 1 , 14 , 100, race);
                     return "/goddess <br> <p class='text-success'>Race Selected as Goddess</p>"}
                 else  return `<p class='text-danger'>You have already started. Your race is ${race}</p>`;   
             case '/elves':
@@ -161,6 +166,12 @@ class Board {
             if (message.value.toLowerCase() === "/battle") {
                 let board = new Board(character);
                 round = 1;
+                battle_ongoing = true;
+                
+                character.hp = character.maxhp
+
+                
+
                 board.battle(round , info);
             }
             document.getElementById('input').value = "";
@@ -173,51 +184,55 @@ class Board {
             this.enemy = new Enemy();
         }
 
-
         let tempBattleContentDiv = document.createElement("div");
 
         tempBattleContentDiv.innerHTML = `
-            <p class='text-center text-light'><strong>Round:${round}</strong></p>
+            <p class='text-center text-light'><strong class='h1'>Round:${round}</strong></p>
             <div class='battle_visual'>
-                <div class='player text-light'><p>Player</p><img src='https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg'></div>
-                <div class='text-center bg-secondary'> <p class='text-danger'>1.Attack</p>
+                <div class='player text-light'>
+                <p>Player</p>
+                <img src='https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg'>
+                 <div class='player_info'>
+                        <p>Players info:</p>
+                        <p>HP:${character.hp}</p>
+                        <P>att:${character.att}</P>
+                        <p>Def:${character.def}</p>
+                        <P>Energy:${character.energylevel}</P>
+                    </div></div>
+
+                    <div class='text-center  battle_choices'> 
+                    <p class='text-danger'>1.Attack</p>
                     <p class='text-primary'>2.Defend</p>
                     <P class='text-lime'>3.Sleep</P>
                     <P class='surrender-text'>4.Surrender</P>
                     <P class='text-gradient'>5.Special Move</P>
                 </div>
-                <div class='enemy text-light'><p>Enemy</p><img src='https://w7.pngwing.com/pngs/9/115/png-transparent-bomb-cartoon-cherry-enemy-evil-explosive-eyes-fuse-game-purple-thumbnail.png'></div>
-            </div><br>
-            <div class='battle_info'>
-                <div class='player_info'>
-                    <p>Players info:</p>
-                    <P>Race:${character.race}</P>
-                    <p>HP:${character.hp}</p>
-                    <P>att:${character.att}</P>
-                    <p>Def:${character.def}</p>
-                    <P>Energy:${character.energylevel}</P>
-                </div>
+                
+                <div class='enemy text-light'>
+                <p>Enemy</p>
+                <img src='https://w7.pngwing.com/pngs/9/115/png-transparent-bomb-cartoon-cherry-enemy-evil-explosive-eyes-fuse-game-purple-thumbnail.png'>
                 <div class='enemy_info'>
                     <p>Enemy info:</p>
                     <p>HP:${this.enemy.hp}</p> <P>att:${this.enemy.att}</P>
                     <p>Def:${this.enemy.def}</p>
                     <P>Energy:${this.enemy.energylevel}</P>
-                </div>
-            </div>
+                </div></div>
+            </div><br>
+            
         `; 
 
         if (this.currentBattleBoard) {
             this.currentBattleBoard.innerHTML = tempBattleContentDiv.innerHTML; 
         } else {
             this.currentBattleBoard = document.createElement("div");
-            this.currentBattleBoard.classList.add("pb-2", "bg-dark", "battle");
+            this.currentBattleBoard.classList.add("pb-2", "bg-dark", "battle" , "rounded");
             this.currentBattleBoard.innerHTML = tempBattleContentDiv.innerHTML; 
             infoDiv.insertAdjacentElement("afterend", this.currentBattleBoard);
         }
         this.addBattleActionButtons(this.currentBattleBoard, round, infoDiv);
     }
 
-    addBattleActionButtons(battleBoardDiv, currentRound, currentInfoDiv) {
+    addBattleActionButtons(battleBoardDiv, _currentRound, currentInfoDiv) {
 
         let existingActionDiv = battleBoardDiv.querySelector(".action-buttons-container");
         if (existingActionDiv) {
@@ -230,8 +245,14 @@ class Board {
         let button_ids = ["attack", "defend", "sleep", "surrender", "special"];
 
         for (let i = 0; i <= 4; i++) {
+
             let action_buttons = document.createElement("button");
             action_buttons.classList.add("btn", "btn-info", "btn-sm", "text-light", "ms-2", "px-3", "text-center", `${button_ids[i]}`);
+            if(!battle_ongoing) {
+                action_buttons.classList.add("disabled");
+                action_buttons.disabled = true;
+
+            }
 
             if (i === 4) {
                 action_buttons.classList.add("special_move_btn");
@@ -243,39 +264,184 @@ class Board {
             action_buttons.addEventListener("click", () => {
                 switch (button_ids[i]) {
                     case "attack":
-                        this.attack(currentRound, currentInfoDiv);
+                        this.player_attack();
                         break;
                     case "defend":
-                        this.defend(currentRound, currentInfoDiv);
+                        this.player_defend();
                         break;
                     case "sleep":
-                        this.sleep(currentRound, currentInfoDiv);
+                        this.player_sleep();
                         break;
                     case "surrender":
-                        this.surrender(currentRound, currentInfoDiv);
+                        this.player_surrender();
+
+
                         break;
                     case "special":
-                        this.special(currentRound, currentInfoDiv);
+                        this.special();
                         break;
                 }
+                 this.battle(round, currentInfoDiv);
             });
             actionBtnDiv.appendChild(action_buttons);
         }
-        battleBoardDiv.appendChild(actionBtnDiv); 
-    }
-        attack(round , info){
+        if(!battle_ongoing){
+            let lose = document.createElement("div");
+            lose.classList.add("rounded" , "bg-light");
+            lose.innerHTML = `<div class='bg-secondary w-50 rounded pt-2 mt-2 lose'> <p class='text-danger'><strong class='h3'>You lose</strong></p>
+            <div class='lose'>
+            <p class='text-light'><strong>Exp gained:</strong></p>
+            <p class='text-light'><strong>Money earned:</strong></p></div></div>`;
+            let content = document.querySelector('.content')
 
-            let player_att = character.att;
-            let enemy_att = this.enemy.att;
-            let enemy_def = this.enemy.def;
-            let player_def = character.def;
-            let player_dmg = Math.max(0, player_att - enemy_def);
-            let enemy_dmg = Math.max(0, enemy_att - player_def);
-            this.enemy.hp -= player_dmg;
-            character.hp -= enemy_dmg;
-
-            this.battle(round +1 , info);
+            content.appendChild(lose)
         }
+        battleBoardDiv.appendChild(actionBtnDiv); 
+
+    }
+
+    battle_choices(player_action  , enemy_action){
+        let current_round = round - 1;
+        let player_text = '';
+        let enemy_text = '';
+        if(character.hp <= 0) {
+                    battle_ongoing = false;
+                }
+        switch (player_action){
+            case 'attack':
+                player_text = `Player has attacked and dealt ${player_dmg} dmg`;
+                break;
+            case 'defend':
+                let dodge = Math.random(); 
+                player_text = dodge > 0.5
+                ? "Player has dodged"
+                : `Player has defended and taken ${enemy_dmg} dmg`;
+                break;
+            case 'sleep':
+                player_text = `Player slept and gained 4 MP`;
+                break;
+            case 'surrender':
+                player_text = `Player has surrendered`;
+                break;
+            case 'special':
+                player_text = `Player has used their MP to perform magical attack to the enemy`;
+                break;
+            default:
+                break;                
+                
+        }
+
+        switch (enemy_action){
+            case 'attack':
+                enemy_text = `Enemy has attacked and dealt ${enemy_dmg} dmg`;
+                break;
+            case 'defend':
+                if(Number(enemy_dmg) === NaN) enemy_dmg = 0;
+                enemy_text = `Enemy has defended and taken ${enemy_dmg} dmg`;
+                break;
+            case 'sleep':
+                enemy_text = `Enemy slept and gained 4Mp`;
+                break;
+            case `special`:
+                enemy_text = `Enemy has used their MP to perform magical attack to the enemy`;
+                break;
+            default: 
+            break;
+        }
+        let content = document.querySelector('.content');
+        let chosen_option = document.createElement("div");
+        chosen_option.innerHTML = `<div class='d-grid chosen_option bg-secondary text-light rounded'>
+        <p><strong>Round: ${current_round}</strong></p>
+        <p>${player_text}</p>
+        <p>${enemy_text}</p>
+        <div class='battle_hp_detail'>
+        <p><strong>Player HP:</strong>${character.hp}</p>
+        <p><strong>Enemy HP:</strong>${this.enemy.hp}</p>
+        </div></div>`;
+        content.appendChild(chosen_option);
+                
+    }
+
+        player_attack(){
+
+            let player_action = `attack`;
+            let player_att = character.att; 
+            let enemy_def = this.enemy.def;
+            let random = Math.random() * 5;
+            player_dmg = Math.floor(Math.max(0, player_att - enemy_def +random));
+            this.enemy.hp -= player_dmg;
+            this.Move_of_enemy( player_action)
+        }
+
+        player_defend(){
+            let player_action = `defend`;
+            let dodge = Math.random(); 
+            let defenseFactor = character.def / (character.def + 100); 
+            let damageTaken = Math.floor(enemy_dmg * (1 - defenseFactor));
+            player_dmg = dodge > 0.6 ? 0 : damageTaken;
+            this.Move_of_enemy( player_action)
+            
+            
+        }
+
+        player_sleep(){
+            let player_action = `sleep`;
+            character.energylevel += 4;
+            this.Move_of_enemy(player_action);
+
+        }
+
+        player_surrender(){
+            let player_action = 'surrender';
+            character.hp = 0;
+            battle_ongoing = false;
+            
+
+            this.Move_of_enemy(player_action);
+        }
+
+        Move_of_enemy( player_action){
+            let enemy_options= ['attack' , 'defend' , 'sleep' , 'special'];
+            let enemy_choise = enemy_options[Math.floor(Math.random() * enemy_options.length)];
+            this.enemyChoise(enemy_choise, player_action);
+
+        }
+
+        enemyChoise(enemy_choise, player_action){
+            console.log(enemy_choise);
+            switch (enemy_choise){
+                case 'attack':
+                    let enemy_att = this.enemy.att;
+                    let player_def = character.def;
+                    enemy_dmg = Math.floor(Math.max(0, enemy_att - player_def + (Math.random() * 5)));
+                    character.hp -=   enemy_dmg; 
+                    this.enemy_action = "attack";
+
+                    break;
+
+                case 'defend':
+                    let dodge = Math.random(); 
+                    let defenseFactor = character.def / (character.def + 100); 
+                    let damageTaken = Math.floor(player_dmg * (1 - defenseFactor));
+                    player_dmg = dodge > 0.7 ? 0 : damageTaken;
+                    this.enemy.hp -= player_dmg;
+                    this.enemy_action = "defend";
+
+                    break;
+                case 'sleep':
+                    this.enemy_action = 'sleep';
+                    this.enemy.energylevel += 4;
+
+            }
+
+            round++;
+            this.battle_choices(player_action, this.enemy_action);
+        }
+
+
+
+
+
     
 }    
              
@@ -291,7 +457,7 @@ class Enemy{
         let eny_name= ["Xyz" , "Abc" , "Pan" , "Doe" , "QBee" , "li-li" , "wine" , "Pipec"];
         this.name = eny_name[Math.floor(Math.random() * eny_name.length)];
         const min_hp = 50;
-        const max_hp = 1000;
+        const max_hp = 100;
         this.hp = Math.floor(Math.random() * (max_hp -min_hp) + min_hp);
         const min_att = 8;
         const max_att = 20;
@@ -311,6 +477,7 @@ class Character{
     constructor(name , hp , att , def , lev , energylevel , money , race ){
         this.name = name;
         this.hp = hp;
+        this.maxhp = hp;
         this.def = def;
         this.att = att;
         this.lev = lev;
@@ -321,6 +488,7 @@ class Character{
     levelUp(){
         this.lev += 1;
         this.hp += 10;
+        this.maxhp += 10;
         this.def += Math.floor(Math.random() * 3) + 1 ;
         this.att += Math.floor(Math.random() * 3) + 1 ;
     }

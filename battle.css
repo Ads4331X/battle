@@ -40,6 +40,12 @@ a {
   line-height: 0.5;
 }
 
+.lose {
+  line-height: 0.5;
+  padding-bottom: 10px;
+  padding-left: 10px;
+}
+
 .typing {
   display: flex;
   justify-content: space-evenly;
@@ -90,4 +96,30 @@ img {
 .enemy_info,
 .player_info {
   color: whitesmoke;
+  text-align: center;
+}
+
+.player,
+.enemy {
+  text-align: center !important;
+}
+
+.battle_choices {
+  margin-top: 5rem !important;
+}
+
+@media screen and (max-width: 490px) {
+  .battle_visual {
+    display: grid;
+  }
+
+  .battle_choices {
+    margin: 10px !important;
+    padding: 10px !important;
+  }
+}
+
+.chosen_option {
+  padding: 10px !important;
+  margin-top: 10px;
 }
