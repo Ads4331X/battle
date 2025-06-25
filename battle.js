@@ -168,7 +168,8 @@ class Board {
                 round = 1;
                 battle_ongoing = true;
                 
-                character.hp = character.maxhp
+                character.hp = character.maxhp;
+                character.energylevel = character.maxenergylevel;
 
                 
 
@@ -274,11 +275,9 @@ class Board {
                         break;
                     case "surrender":
                         this.player_surrender();
-
-
                         break;
                     case "special":
-                        this.special();
+                        this.player_special();
                         break;
                 }
                  this.battle(round, currentInfoDiv);
@@ -324,7 +323,9 @@ class Board {
                 player_text = `Player has surrendered`;
                 break;
             case 'special':
-                player_text = `Player has used their MP to perform magical attack to the enemy`;
+                player_text = (player_dmg === 0) ?
+                      `Player used a special move, but it had no effect or they didn't have enough energy!` : 
+                      `Player has used their energy to perform a magical attack and dealt ${player_dmg} dmg`;
                 break;
             default:
                 break;                
@@ -336,14 +337,13 @@ class Board {
                 enemy_text = `Enemy has attacked and dealt ${enemy_dmg} dmg`;
                 break;
             case 'defend':
-                if(Number(enemy_dmg) === NaN) enemy_dmg = 0;
                 enemy_text = `Enemy has defended and taken ${enemy_dmg} dmg`;
                 break;
             case 'sleep':
                 enemy_text = `Enemy slept and gained 4Mp`;
                 break;
             case `special`:
-                enemy_text = `Enemy has used their MP to perform magical attack to the enemy`;
+                enemy_text = `Enemy has used their MP to perform magical attack to the Player and dealt ${enemy_dmg} dmg`;
                 break;
             default: 
             break;
@@ -395,10 +395,22 @@ class Board {
             let player_action = 'surrender';
             character.hp = 0;
             battle_ongoing = false;
-            
-
             this.Move_of_enemy(player_action);
         }
+
+        player_special(){
+            let player_action = 'special';
+            let MP = character.energylevel;
+            if(MP < 10) {player_dmg = 0;}
+            else{
+                player_dmg = Math.floor(Math.max(0, character.att - this.enemy.def +(Math.random() * 8)) *  (MP / 10));
+                this.enemy.hp -= player_dmg;
+                character.energylevel = 0;
+            }
+            this.Move_of_enemy(player_action);
+        }
+
+
 
         Move_of_enemy( player_action){
             let enemy_options= ['attack' , 'defend' , 'sleep' , 'special'];
@@ -416,22 +428,32 @@ class Board {
                     enemy_dmg = Math.floor(Math.max(0, enemy_att - player_def + (Math.random() * 5)));
                     character.hp -=   enemy_dmg; 
                     this.enemy_action = "attack";
-
                     break;
 
                 case 'defend':
-                    let dodge = Math.random(); 
                     let defenseFactor = character.def / (character.def + 100); 
                     let damageTaken = Math.floor(player_dmg * (1 - defenseFactor));
-                    player_dmg = dodge > 0.7 ? 0 : damageTaken;
+                    player_dmg = damageTaken;
                     this.enemy.hp -= player_dmg;
                     this.enemy_action = "defend";
-
                     break;
+
                 case 'sleep':
                     this.enemy_action = 'sleep';
                     this.enemy.energylevel += 4;
+                    break;
 
+                case 'special':
+                    let MP = this.enemy.energylevel;
+                    if(MP < 10) {enemy_dmg = 0;}
+                    else{
+                    enemy_dmg = Math.floor(Math.max(0, this.enemy.att - character.def +(Math.random() * 6)) *  (MP / 10));
+                    character.hp -= enemy_dmg;
+                    this.enemy.energylevel = 0;
+                    }
+                    this.enemy_action = "special";
+                    break;
+                
             }
 
             round++;
@@ -445,13 +467,6 @@ class Board {
     
 }    
              
-
-
-
-        
-
-    
-
 class Enemy{
     constructor(){
         let eny_name= ["Xyz" , "Abc" , "Pan" , "Doe" , "QBee" , "li-li" , "wine" , "Pipec"];
@@ -482,6 +497,7 @@ class Character{
         this.att = att;
         this.lev = lev;
         this.energylevel = energylevel;
+        this.maxenergylevel = energylevel;
         this.money = money;
         this.race = race
     }
