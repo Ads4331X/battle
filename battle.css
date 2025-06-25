@@ -46,6 +46,12 @@ a {
   padding-left: 10px;
 }
 
+.win-text {
+  color: lime;
+}
+
+
+
 .typing {
   display: flex;
   justify-content: space-evenly;

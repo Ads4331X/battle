@@ -284,14 +284,29 @@ class Board {
             });
             actionBtnDiv.appendChild(action_buttons);
         }
-        if(!battle_ongoing){
+        let content = document.querySelector('.content')
+
+        if(this.enemy.hp <= 0){
+            let win = document.createElement("div");
+            win.classList.add("rounded" , "bg-light");
+            win.innerHTML = `<div class='won_info rounded w-50 pt-2 mt-2 bg-secondary'>
+            <p class='win-text'><strong class='h3'>You Win</strong></p>
+            <p class='text-light'><strong>Exp gained:</strong></p>
+            <p class='text-light'><strong>Money earned:</strong></p>
+            <div class='win_actions'>
+            <button class='btn btn-success'>Continue</button</div>
+            <button class='btn btn-danger' >Leave</button>
+            </div>`;
+            content.appendChild(win);
+            
+        }
+        if(character.hp <= 0){
             let lose = document.createElement("div");
             lose.classList.add("rounded" , "bg-light");
             lose.innerHTML = `<div class='bg-secondary w-50 rounded pt-2 mt-2 lose'> <p class='text-danger'><strong class='h3'>You lose</strong></p>
             <div class='lose'>
             <p class='text-light'><strong>Exp gained:</strong></p>
             <p class='text-light'><strong>Money earned:</strong></p></div></div>`;
-            let content = document.querySelector('.content')
 
             content.appendChild(lose)
         }
@@ -303,7 +318,7 @@ class Board {
         let current_round = round - 1;
         let player_text = '';
         let enemy_text = '';
-        if(character.hp <= 0) {
+        if(character.hp <= 0 || this.enemy.hp <= 0) {
                     battle_ongoing = false;
                 }
         switch (player_action){
