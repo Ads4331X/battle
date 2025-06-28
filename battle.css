@@ -50,8 +50,6 @@ a {
   color: lime;
 }
 
-
-
 .typing {
   display: flex;
   justify-content: space-evenly;
@@ -123,9 +121,56 @@ img {
     margin: 10px !important;
     padding: 10px !important;
   }
+  .chosen_option {
+    width: 100% !important;
+  }
 }
 
 .chosen_option {
   padding: 10px !important;
   margin-top: 10px;
+  width: 50%;
 }
+
+.win_actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px;
+}
+
+.divofchosenoption {
+  background-color: whitesmoke !important;
+}
+
+.white,
+.error {
+  background-color: whitesmoke !important;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+body {
+  border: 5px solid pink;
+  background-color: pink !important;
+}
+
+.body {
+  background-color: white !important;
+}
+
+

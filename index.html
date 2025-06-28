@@ -21,9 +21,9 @@
   </head>
 
   <body>
-    <div class="d-flex justify-content-center align-items-end mt-2 h-100">
+    <div class="d-flex justify-content-center align-items-end">
       <div
-        class="w-75 p-3 body rounded"
+        class="w-100 p-3 body rounded"
         style="border: 5px solid pink; height: 100vh"
       >
         <div class="mt-2 content flex-grow-1 overflow-auto">
@@ -96,33 +96,38 @@
               class="dropdown-menu text-primary border-0"
               style="max-height: 200px; overflow-y: auto"
             >
-              <a
+              <a href="#"
                 class="suggest"
-                onclick="document.getElementById('input').value = '/Help'"
+                onclick="document.getElementById('input').value = '/Help';
+                document.getElementById('input').focus();"
                 >&nbsp;&nbsp;/Help</a
               >
               <hr />
-              <a
+              <a href="#"
                 class="suggest"
-                onclick="document.getElementById('input').value = '/P'"
+                onclick="document.getElementById('input').value = '/P';
+                document.getElementById('input').focus();"
                 >&nbsp;&nbsp;/P</a
               >
               <hr />
-              <a
+              <a href="#"
                 class="suggest"
-                onclick="document.getElementById('input').value = '/Cd'"
+                onclick="document.getElementById('input').value = '/Cd';
+                document.getElementById('input').focus();"
                 >&nbsp;&nbsp;/Cd</a
               >
               <hr />
-              <a
+              <a href="#"
                 class="suggest"
-                onclick="document.getElementById('input').value = '/Battle'"
+                onclick="document.getElementById('input').value = '/Battle';
+                document.getElementById('input').focus();"
                 >&nbsp;&nbsp;/Battle</a
               >
               <hr />
-              <a
+              <a href="#"
                 class="suggest"
-                onclick="document.getElementById('input').value = '/Missions'"
+                onclick="document.getElementById('input').value = '/Missions';
+                document.getElementById('input').focus();"
               >
                 &nbsp;&nbsp;/Missions
               </a>
